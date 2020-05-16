@@ -26,8 +26,6 @@ module Api::Auth::RequireAuthToken
     end
   end
 
-  # Tells the compiler that the current_user is not nil since we have checked
-  # that the user is signed in
   private def current_user : User
     current_user?.not_nil!
   end
