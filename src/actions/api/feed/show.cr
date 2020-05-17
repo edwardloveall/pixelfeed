@@ -1,6 +1,4 @@
 class Api::Feed::Show < ApiAction
-  include Api::Auth::SkipRequireAuthToken
-
   get "/feed" do
     config = SubredditConfig.new(
       subreddit: "PixelArt",
