@@ -33,7 +33,12 @@ class Clients::Reddit
         "Authorization" => "bearer #{token}",
       }
     )
-    SubredditResponse::Root.from_json(response.body)
+    begin
+      SubredditResponse::Root.from_json(response.body)
+    rescue
+      Log.error { response.body }
+      raise "There was an error fetching the subreddit data"
+    end
   end
 
   private def get_token
@@ -58,15 +63,20 @@ class Clients::Reddit
   private def refreshed_token_response
     client = HTTP::Client.new("www.reddit.com", tls: true)
     client.basic_auth(username: settings.api_id, password: settings.api_key)
-    json = client.post(
+    response = client.post(
       "/api/v1/access_token",
       form: {
         "grant_type" => "password",
         "username"   => settings.username,
         "password"   => settings.password,
       },
-    ).body
-    AuthResponse.from_json(json)
+    )
+    begin
+      AuthResponse.from_json(response.body)
+    rescue
+      Log.error { response.body }
+      raise "There was an error refreshing the auth token"
+    end
   end
 
   private def find_or_create_service_token
