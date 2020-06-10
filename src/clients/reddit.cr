@@ -35,8 +35,8 @@ class Clients::Reddit
     )
     begin
       SubredditResponse::Root.from_json(response.body)
-    rescue
-      Log.error { response.body }
+    rescue e
+      Log.error { e }
       raise "There was an error fetching the subreddit data"
     end
   end
@@ -125,12 +125,17 @@ module SubredditResponse
   end
 
   class Media < Base
-    property reddit_video : RedditVideo
+    property reddit_video : RedditVideo?
+    property oembed : OEmbed?
   end
 
   class RedditVideo < Base
     property fallback_url : String
     property height : Int32
     property width : Int32
+  end
+
+  class OEmbed < Base
+    property html : String
   end
 end
