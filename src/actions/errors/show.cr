@@ -4,9 +4,9 @@
 class Errors::Show < Lucky::ErrorAction
   DEFAULT_MESSAGE = "Something went wrong."
   default_format :json
-  dont_report [Lucky::RouteNotFoundError]
+  dont_report [Lucky::RouteNotFoundError, Avram::RecordNotFoundError]
 
-  def render(error : Lucky::RouteNotFoundError)
+  def render(error : Lucky::RouteNotFoundError | Avram::RecordNotFoundError)
     error_json "Not found", status: 404
   end
 
