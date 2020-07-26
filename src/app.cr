@@ -1,6 +1,7 @@
 require "./shards"
 
 require "./app_database"
+require "./lib/**"
 require "./models/base_model"
 require "./models/mixins/**"
 require "./models/**"
