@@ -1,5 +1,5 @@
-class Api::Feed::Show < ApiAction
-  get "/feed" do
+class Api::Feed::Reddit::Index < ApiAction
+  get "/reddit/feed" do
     config = SubredditConfig.new(
       subreddit: "PixelArt",
       sort: SubredditConfig::Sort::Top,

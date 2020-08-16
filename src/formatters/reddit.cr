@@ -7,7 +7,7 @@ class Formatters::Reddit
 
   def feed : Feed
     Feed.new(
-      feed_url: Api::Feed::Show.url,
+      feed_url: Api::Feed::Reddit::Index.url,
       home_page_url: subreddit_url,
       items: items,
       title: "Reddit - #{config.subreddit}",
