@@ -2,6 +2,22 @@
 
 This is a project written using [Lucky](https://luckyframework.org). Enjoy!
 
+## Deploying
+
+This relies on a service stored at: /etc/systemd/system/pixelfeed.service
+
+```sh
+#!/bin/sh
+
+set -e
+
+git pull origin main
+shards install
+crystal build --release src/start_server.cr
+sudo systemctl daemon-reload # if the service changed
+sudo service pixelfeed restart
+```
+
 ### Setting up the project
 
 1. [Install required dependencies](https://luckyframework.org/guides/getting-started/installing#install-required-dependencies)
