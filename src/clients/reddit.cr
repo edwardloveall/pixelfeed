@@ -118,6 +118,7 @@ module SubredditResponse
     property created : Float32
     property is_video : Bool
     property media : Media | Nil
+    property media_metadata : Hash(String, MediaMetadata) | Nil
     property name : String
     property permalink : String
     property title : String
@@ -137,5 +138,13 @@ module SubredditResponse
 
   class OEmbed < Base
     property html : String
+  end
+
+  class MediaMetadata < Base
+    property s : Source
+  end
+
+  class Source < Base
+    property u : String
   end
 end
