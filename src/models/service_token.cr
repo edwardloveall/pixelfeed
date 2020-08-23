@@ -2,6 +2,7 @@ class ServiceToken < BaseModel
   table do
     column service : String
     column token : String
+    column refresh_token : String?
     column expires_at : Time
   end
 
