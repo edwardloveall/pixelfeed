@@ -1,6 +1,6 @@
 # pixelfeed
 
-This is a project written using [Lucky](https://luckyframework.org). Enjoy!
+A feed of pixelart from various services (Reddit, Twitter, DeviantArt, etc)
 
 ## Deploying
 
@@ -12,19 +12,21 @@ This relies on a service stored at: /etc/systemd/system/pixelfeed.service
 set -e
 
 git pull origin main
+# Migrating? see below
 shards install
 crystal build --release src/start_server.cr
 sudo systemctl daemon-reload # if the service changed
 sudo service pixelfeed restart
 ```
 
-### Setting up the project
+### Migrating
 
-1. [Install required dependencies](https://luckyframework.org/guides/getting-started/installing#install-required-dependencies)
-1. Update database settings in `config/database.cr`
-1. Run `script/setup`
-1. Run `lucky dev` to start the app
+To migrate you need to set all the environment varibles for the app. One easy way to do this is to copy/paste from your local `.env` file, and escape the newline characters at the end. Something like this:
 
-### Learning Lucky
+```sh
+FOO=... \
+BAR=... \
+DATABASE_URL=postgresql://username:password@127.0.0.1/pixelfeed_production
+```
 
-Lucky uses the [Crystal](https://crystal-lang.org) programming language. You can learn about Lucky from the [Lucky Guides](https://luckyframework.org/guides/getting-started/why-lucky).
+They don't even have to be the real values, except for the `DATABASE_URL`. You can find the username and password in 1Password under `pixelfeed Deploy`. Once they're all set, you can run `crystal run tasks.cr -- db.migrate`
