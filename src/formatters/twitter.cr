@@ -1,6 +1,7 @@
 class Formatters::Twitter
   DATE_FORMAT = "%a %b %d %H:%M:%S %z %Y"
   alias Tweet = TwitterResponse::Tweet
+  alias Medium = TwitterResponse::Medium
 
   getter response : TwitterResponse::Root
   getter config : TwitterConfig
@@ -52,7 +53,7 @@ class Formatters::Twitter
   private def content_html(tweet : Tweet) : String
     <<-HTML.strip
       <p>#{nicer_text(tweet)}</p>
-      #{media(tweet)}
+      #{content(tweet)}
     HTML
   end
 
@@ -60,13 +61,31 @@ class Formatters::Twitter
     tweet.text.gsub("\n", "<br />")
   end
 
-  private def media(tweet : Tweet)
+  private def content(tweet : Tweet)
     if entities = tweet.extended_entities
-      entities.media.map do |media|
-        %(<img src="#{media.media_url_https}" />)
+      entities.media.map do |medium|
+        display_medium(medium)
       end.join("\n")
     else
       return ""
+    end
+  end
+
+  private def display_medium(medium : Medium)
+    if medium.type == "photo"
+      %(<img src="#{medium.media_url_https}" />)
+    elsif medium.type == "animated_gif" && (video_info = medium.video_info)
+      video_info.variants.map do |variant|
+        <<-HTML.strip
+          <video autoplay loop>
+            <source src="#{variant.url}">
+            Your browser does not support the video tag.
+          </video>
+        HTML
+      end.join("\n")
+    else
+      "Could not parse media content. Here's the JSON:" +
+        medium.to_json
     end
   end
 
@@ -78,18 +97,18 @@ class Formatters::Twitter
   end
 
   private def should_display?(tweet : Tweet)
-    has_pixelart_hashtag?(tweet) && has_media?(tweet)
+    tagged_pixelart?(tweet) && has_media?(tweet)
   end
 
   private def has_media?(tweet : Tweet)
     tweet.extended_entities
   end
 
-  private def has_pixelart_hashtag?(tweet : Tweet)
+  private def tagged_pixelart?(tweet : Tweet)
     tweet
       .entities
       .hashtags
-      .map { |hashtag| hashtag.text }
+      .map(&.text)
       .includes?("pixelart")
   end
 end

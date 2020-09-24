@@ -77,6 +77,16 @@ module TwitterResponse
 
   class Medium < Base
     getter media_url_https : String
+    getter type : String
+    getter video_info : VideoInfo | Nil
+  end
+
+  class VideoInfo < Base
+    getter variants : Array(Variant)
+  end
+
+  class Variant < Base
+    getter url : String
   end
 
   class User < Base
