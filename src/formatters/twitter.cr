@@ -2,6 +2,8 @@ class Formatters::Twitter
   DATE_FORMAT = "%a %b %d %H:%M:%S %z %Y"
   alias Tweet = TwitterResponse::Tweet
   alias Medium = TwitterResponse::Medium
+  alias VideoInfo = TwitterResponse::VideoInfo
+  alias MediaVariant = TwitterResponse::Variant
 
   getter response : TwitterResponse::Root
   getter config : TwitterConfig
@@ -83,16 +85,37 @@ class Formatters::Twitter
           </video>
         HTML
       end.join("\n")
+    elsif medium.type == "video" && (video_info = medium.video_info)
+      url = url_of_largest_video(video_info.variants)
+      <<-HTML.strip
+        <video autoplay loop poster="#{medium.media_url_https}">
+          <source src="#{url}">
+          Your browser does not support the video tag.
+        </video>
+      HTML
     else
-      "Could not parse media content. Here's the JSON:" +
-        medium.to_json
+      fallback_content(medium)
     end
   end
 
-  private def fallback_content(tweet : Tweet) : String
+  private def url_of_largest_video(variants : Array(MediaVariant))
+    largest_variant = variants.max_by do |variant|
+      if match = variant.url.match(/\d+x\d+/)
+        dimentions = match[0]
+        dimentions.split("x").map(&.to_i).product(1)
+      else
+        0
+      end
+    end
+    largest_variant.url
+  end
+
+  private def fallback_content(medium : Medium) : String
     <<-HTML.strip
-      <p>⚠️ Something went wrong. Here's the tweet json:</p>
-      <pre style="white-space: pre-wrap;">#{tweet.to_json}</pre>
+      <p>⚠️ Something went wrong. Here's the tweet's media json:</p>
+      <pre style="white-space: pre-wrap;">
+        <code>#{medium.to_json}</code>
+      </pre>
     HTML
   end
 
