@@ -5,6 +5,7 @@ class Formatters::Reddit
   alias OEmbed = SubredditResponse::OEmbed
   alias RedditVideo = SubredditResponse::RedditVideo
   alias MediaMetadata = Hash(String, SubredditResponse::MediaMetadata)
+  alias MediaSource = SubredditResponse::Source
 
   getter response : Response
   getter config : SubredditConfig
@@ -103,8 +104,13 @@ class Formatters::Reddit
   private def gallery_content(gallery_items : MediaMetadata) : String
     gallery_items
       .values
-      .map { |gallery_item| HTML.unescape(gallery_item.s.u) }
+      .map { |gallery_item| gallery_url(source: gallery_item.s) }
       .map { |url| %{<img src="#{url}" />} }
       .join
+  end
+
+  private def gallery_url(source : MediaSource)
+    fallback = "http://s.edwardloveall.com/error-check-your-json.png"
+    HTML.unescape(source.u || source.gif || fallback)
   end
 end

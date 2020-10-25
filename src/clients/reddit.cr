@@ -145,6 +145,7 @@ module SubredditResponse
   end
 
   class Source < Base
-    property u : String
+    property u : String | Nil
+    property gif : String | Nil
   end
 end
